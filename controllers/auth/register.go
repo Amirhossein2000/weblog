@@ -16,7 +16,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	user, err := utils.UnmarshalUser(r.Body)
 	if err != nil {
-		utils.BadResponseErr(w)
+		utils.BadJsonRequestStructure(w)
 		return
 	}
 

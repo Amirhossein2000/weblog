@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"weblog/controllers/article"
 	"weblog/controllers/auth"
@@ -22,5 +23,8 @@ func main() {
 
 	port := ":8080"
 	fmt.Println("server started on port", port)
-	http.ListenAndServe(port, nil)
+	err := http.ListenAndServe(port, nil)
+	if err != nil {
+		log.Println("could not start server err:", err.Error())
+	}
 }

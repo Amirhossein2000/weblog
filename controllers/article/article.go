@@ -29,14 +29,14 @@ func ArticleController(w http.ResponseWriter, r *http.Request) {
 		return
 
 	default:
-		utils.BadResponseErr(w)
+		utils.UnsupportedMethodErr(w, r.Method)
 	}
 }
 
 func getHandler(w http.ResponseWriter, r *http.Request) {
 	articleID, err := utils.GetIDFromRequest(r)
 	if err != nil {
-		utils.BadResponseErr(w)
+		utils.BadIDInURLErr(w)
 		return
 	}
 
@@ -69,7 +69,7 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 func postHandler(w http.ResponseWriter, r *http.Request, authUser *utils.AuthenticatedUser) {
 	article, err := utils.UnmarshalArticle(r.Body)
 	if err != nil {
-		utils.BadResponseErr(w)
+		utils.BadJsonRequestStructure(w)
 		return
 	}
 
@@ -77,7 +77,7 @@ func postHandler(w http.ResponseWriter, r *http.Request, authUser *utils.Authent
 
 	err = database.DB.Create(&article).Error
 	if err != nil {
-		utils.BadResponseErr(w)
+		utils.InternalServerErr(w)
 		return
 	}
 
@@ -90,7 +90,7 @@ func postHandler(w http.ResponseWriter, r *http.Request, authUser *utils.Authent
 func putHandler(w http.ResponseWriter, r *http.Request, authUser *utils.AuthenticatedUser) {
 	article, err := utils.UnmarshalArticle(r.Body)
 	if err != nil {
-		utils.BadResponseErr(w)
+		utils.BadJsonRequestStructure(w)
 		return
 	}
 
@@ -106,7 +106,7 @@ func putHandler(w http.ResponseWriter, r *http.Request, authUser *utils.Authenti
 
 	err = database.DB.Save(&article).Error
 	if err != nil {
-		utils.BadResponseErr(w)
+		utils.InternalServerErr(w)
 		return
 	}
 
@@ -119,7 +119,7 @@ func putHandler(w http.ResponseWriter, r *http.Request, authUser *utils.Authenti
 func deleteHandler(w http.ResponseWriter, r *http.Request, authUser *utils.AuthenticatedUser) {
 	articleID, err := utils.GetIDFromRequest(r)
 	if err != nil {
-		utils.BadResponseErr(w)
+		utils.BadIDInURLErr(w)
 		return
 	}
 

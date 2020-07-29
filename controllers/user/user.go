@@ -23,14 +23,14 @@ func UserController(w http.ResponseWriter, r *http.Request) {
 		return
 
 	default:
-		utils.BadResponseErr(w)
+		utils.UnsupportedMethodErr(w, r.Method)
 	}
 }
 
 func getHandler(w http.ResponseWriter, r *http.Request) {
 	userID, err := utils.GetIDFromRequest(r)
 	if err != nil {
-		utils.BadResponseErr(w)
+		utils.BadIDInURLErr(w)
 		return
 	}
 
@@ -49,7 +49,7 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 func putHandler(w http.ResponseWriter, r *http.Request, authUser *utils.AuthenticatedUser) {
 	updateUser, err := utils.UnmarshalUser(r.Body)
 	if err != nil {
-		utils.BadResponseErr(w)
+		utils.BadJsonRequestStructure(w)
 		return
 	}
 
@@ -75,7 +75,7 @@ func putHandler(w http.ResponseWriter, r *http.Request, authUser *utils.Authenti
 
 	err = database.DB.Save(&updateUser).Error
 	if err != nil {
-		utils.BadResponseErr(w)
+		utils.InternalServerErr(w)
 		return
 	}
 
@@ -88,7 +88,7 @@ func putHandler(w http.ResponseWriter, r *http.Request, authUser *utils.Authenti
 func deleteHandler(w http.ResponseWriter, r *http.Request, authUser *utils.AuthenticatedUser) {
 	userId, err := utils.GetIDFromRequest(r)
 	if err != nil {
-		utils.BadResponseErr(w)
+		utils.BadIDInURLErr(w)
 		return
 	}
 

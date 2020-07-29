@@ -21,14 +21,14 @@ func LoginController(w http.ResponseWriter, r *http.Request) {
 	loginRequest := schema.LoginRequest{}
 	byteRequest, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		utils.BadResponseErr(w)
+		utils.InternalServerErr(w)
 		return
 	}
 
 	err = json.Unmarshal(byteRequest, &loginRequest)
 	if err != nil {
 		log.Println("Unmarshal LoginRequest err:", err.Error())
-		utils.BadResponseErr(w)
+		utils.BadJsonRequestStructure(w)
 		return
 	}
 

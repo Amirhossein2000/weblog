@@ -18,7 +18,7 @@ func TimelineController(w http.ResponseWriter, r *http.Request) {
 		return
 
 	default:
-		utils.BadResponseErr(w)
+		utils.UnsupportedMethodErr(w, r.Method)
 	}
 }
 
@@ -26,13 +26,13 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 	timelineRequest := schema.TimelineRequest{}
 	byteRequest, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		utils.BadResponseErr(w)
+		utils.InternalServerErr(w)
 		return
 	}
 
 	err = json.Unmarshal(byteRequest, &timelineRequest)
 	if err != nil {
-		utils.BadResponseErr(w)
+		utils.BadJsonRequestStructure(w)
 		return
 	}
 
@@ -49,7 +49,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("DB err:", err.Error())
-		utils.BadResponseErr(w)
+		utils.InternalServerErr(w)
 		return
 	}
 

@@ -28,14 +28,14 @@ func CommentController(w http.ResponseWriter, r *http.Request) {
 		return
 
 	default:
-		utils.BadResponseErr(w)
+		utils.UnsupportedMethodErr(w, r.Method)
 	}
 }
 
 func getHandler(w http.ResponseWriter, r *http.Request) {
 	articleID, err := utils.GetIDFromRequest(r)
 	if err != nil {
-		utils.BadResponseErr(w)
+		utils.BadIDInURLErr(w)
 		return
 	}
 
@@ -55,7 +55,7 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 func postHandler(w http.ResponseWriter, r *http.Request, authUser *utils.AuthenticatedUser) {
 	comment, err := utils.UnmarshalComment(r.Body)
 	if err != nil {
-		utils.BadResponseErr(w)
+		utils.BadJsonRequestStructure(w)
 		return
 	}
 
@@ -67,7 +67,7 @@ func postHandler(w http.ResponseWriter, r *http.Request, authUser *utils.Authent
 
 	err = database.DB.Create(&comment).Error
 	if err != nil {
-		utils.BadResponseErr(w)
+		utils.InternalServerErr(w)
 		return
 	}
 
@@ -80,7 +80,7 @@ func postHandler(w http.ResponseWriter, r *http.Request, authUser *utils.Authent
 func putHandler(w http.ResponseWriter, r *http.Request, authUser *utils.AuthenticatedUser) {
 	newComment, err := utils.UnmarshalComment(r.Body)
 	if err != nil {
-		utils.BadResponseErr(w)
+		utils.BadJsonRequestStructure(w)
 		return
 	}
 
@@ -95,7 +95,7 @@ func putHandler(w http.ResponseWriter, r *http.Request, authUser *utils.Authenti
 	err = database.DB.Model(&comment).Where("id = ?", newComment.ID).
 		UpdateColumn("value", newComment.Value).Error
 	if err != nil {
-		utils.BadResponseErr(w)
+		utils.InternalServerErr(w)
 		return
 	}
 
@@ -108,7 +108,7 @@ func putHandler(w http.ResponseWriter, r *http.Request, authUser *utils.Authenti
 func deleteHandler(w http.ResponseWriter, r *http.Request, authUser *utils.AuthenticatedUser) {
 	commentID, err := utils.GetIDFromRequest(r)
 	if err != nil {
-		utils.BadResponseErr(w)
+		utils.BadIDInURLErr(w)
 		return
 	}
 
