@@ -11,7 +11,7 @@ import (
 func UserController(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		getHandler(w, r)
+		middleware.AuthRequire(w, r, getHandler)
 		return
 
 	case http.MethodPut:
@@ -27,7 +27,7 @@ func UserController(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getHandler(w http.ResponseWriter, r *http.Request) {
+func getHandler(w http.ResponseWriter, r *http.Request, authUser *utils.AuthenticatedUser) {
 	userID, err := utils.GetIDFromRequest(r)
 	if err != nil {
 		utils.BadIDInURLErr(w)
@@ -43,6 +43,12 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 		utils.WriteResponse(w, http.StatusNotFound, responseBody)
 		return
 	}
+
+	if !utils.HasPermission(userID, authUser) {
+		user.Email = ""
+		user.Password = ""
+	}
+
 	utils.WriteResponse(w, http.StatusOK, user)
 }
 

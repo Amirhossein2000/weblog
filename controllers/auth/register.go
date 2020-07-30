@@ -3,6 +3,7 @@ package auth
 import (
 	"net/http"
 	"weblog/database"
+	"weblog/schema"
 	"weblog/utils"
 )
 
@@ -22,12 +23,28 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	user.Role = utils.UserRole
 
-	err = database.DB.Create(&user).Error
-	if err != nil || user == nil {
+	oldUser := &schema.User{}
+	database.DB.Select("email").Where("email = ?", user.Email).First(oldUser)
+	if oldUser.Email != "" {
 		responseBody := map[string]string{
-			"message": "username or email has been taken",
+			"message": "email has been taken",
 		}
 		utils.WriteResponse(w, http.StatusOK, responseBody)
+		return
+	}
+
+	database.DB.Select("username").Where("username = ?", user.Username).First(oldUser)
+	if oldUser.Username != "" {
+		responseBody := map[string]string{
+			"message": "username has been taken",
+		}
+		utils.WriteResponse(w, http.StatusOK, responseBody)
+		return
+	}
+
+	err = database.DB.Create(&user).Error
+	if err != nil || user == nil {
+		utils.InternalServerErr(w)
 		return
 	}
 
