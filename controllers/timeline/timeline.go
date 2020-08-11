@@ -44,7 +44,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 			Limit(timelineRequest.Limit).Find(&articles).Error
 	} else {
 		err = database.DB.Select("id").Offset(timelineRequest.Offset).
-			Limit(timelineRequest.Limit).Where("user_id = ?", timelineRequest.UserId).Find(&articles).Error
+			Limit(timelineRequest.Limit).Find(&articles, "user_id = ?", timelineRequest.UserId).Error
 	}
 
 	if err != nil {

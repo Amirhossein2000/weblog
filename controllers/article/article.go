@@ -50,7 +50,7 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 	articleWithComments := &schema.ArticleWithComments{Article: article}
 	parentComments := []schema.Comment{}
 
-	err = database.DB.Where("article_id = ? AND parent_comment_id = 0", article.ID).Find(&parentComments).Error
+	err = database.DB.Find(&parentComments, "article_id = ? AND parent_comment_id = 0", article.ID).Error
 	if err != nil {
 		log.Println("DB err:", err.Error())
 	}
@@ -135,7 +135,10 @@ func deleteHandler(w http.ResponseWriter, r *http.Request, authUser *utils.Authe
 	}
 
 	database.DB.Delete(&schema.Article{}, articleID)
-	database.DB.Delete(&schema.Comment{}, "article_id = ?", articleID)
+	comments := []schema.Comment{}
+	database.DB.Select("id").Find(&comments, "article_id = ?", articleID)
+
+	utils.DeleteMultiCommentsWithReplys(comments)
 
 	responseBody := map[string]string{
 		"message": "Deleted Successfully",

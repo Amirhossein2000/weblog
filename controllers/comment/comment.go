@@ -1,7 +1,6 @@
 package comment
 
 import (
-	"log"
 	"net/http"
 	"weblog/database"
 	"weblog/middleware"
@@ -120,10 +119,7 @@ func deleteHandler(w http.ResponseWriter, r *http.Request, authUser *utils.Authe
 		return
 	}
 
-	err = database.DB.Delete(&schema.Comment{}, commentID).Error
-	if err != nil {
-		log.Println("DB err:", err.Error())
-	}
+	utils.DeleteSubComments(commentID)
 
 	responseBody := map[string]string{
 		"message": "Deleted Successfully",
